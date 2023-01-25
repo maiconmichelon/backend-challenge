@@ -1,15 +1,11 @@
 const {getProfile} = require('../middleware/getProfile');
 const express = require('express');
+const contractsService = require('../services/contracts.service');
 const router = express.Router();
 
-/**
- * FIX ME!
- * @returns contract by id
- */
 router.get('/:id', getProfile, async (req, res) =>{
-    const {Contract} = req.app.get('models')
     const {id} = req.params
-    const contract = await Contract.findOne({where: {id}})
+    const contract = await contractsService.getContractByIdAndProfileId(req.app, id, req.profile.id);
     if(!contract) return res.status(404).end()
     res.json(contract)
 });
