@@ -7,7 +7,7 @@ const getUnpaidJobsByProfileId = async(app, profileId) => {
 
   return await Job.findAll({
     where: {
-      // paid: false, // FIXME
+      paid: false,
       [Op.or]: {
         "$Contract.ClientId$": profileId,
         "$Contract.ContractorId$": profileId,
@@ -25,7 +25,7 @@ const getUnpaidJobByClientId = async(app, profileId, jobId, options) => {
   return await Job.findOne({
     where: {
       id: jobId,
-      // paid: false, // FIXME
+      paid: false,
       [Op.or]: {
         "$Contract.ClientId$": profileId,
       },
@@ -42,7 +42,7 @@ const getSumAmountUnpaidJobsByClientId = async(app, profileId, options) => {
   const {Job, Contract} = app.get('models');
   return await Job.sum('price', {
     where: {
-      // paid: false, // FIXME
+      paid: false,
       [Op.or]: {
         "$Contract.ClientId$": profileId,
       },
