@@ -5,8 +5,11 @@ seed();
 
 async function seed() {
   // create tables
+  await Profile.drop();
   await Profile.sync({ force: true });
+  await Contract.drop();
   await Contract.sync({ force: true });
+  await Job.drop();
   await Job.sync({ force: true });
   //insert data
   await Promise.all([
@@ -118,7 +121,7 @@ async function seed() {
     }),
     Contract.create({
       id:7,
-      terms: 'bla bla bla',
+      terms: 'bla bla bla 7',
       status: 'in_progress',
       ClientId: 4,
       ContractorId: 7
