@@ -1,15 +1,12 @@
-const { Profile, Contract, Job } = require('../src/model');
+const { Profile, Contract, Job } = require('../src/models');
 
 /* WARNING THIS WILL DROP THE CURRENT DATABASE */
 seed();
 
 async function seed() {
   // create tables
-  await Profile.drop();
   await Profile.sync({ force: true });
-  await Contract.drop();
   await Contract.sync({ force: true });
-  await Job.drop();
   await Job.sync({ force: true });
   //insert data
   await Promise.all([
@@ -42,7 +39,7 @@ async function seed() {
       firstName: 'Ash',
       lastName: 'Kethcum',
       profession: 'Pokemon master',
-      balance: 1.3,
+      balance: 1000000.3,
       type:'client'
     }),
     Profile.create({
