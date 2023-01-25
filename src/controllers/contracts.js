@@ -10,4 +10,9 @@ router.get('/:id', getProfile, async (req, res) =>{
     res.json(contract)
 });
 
+router.get('/', getProfile, async (req, res) => {
+    const contracts = await contractsService.getActiveContractsByProfileId(req.app, req.profile.id);
+    res.json(contracts);
+})
+
 module.exports = router;
