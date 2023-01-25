@@ -70,7 +70,7 @@ const payJob = async (app, profile, jobId) => {
     await moveMoney(app, contract.ClientId, contract.ContractorId, job.price, transaction);
 
     await Job.update(
-      { paid: true }, 
+      { paid: true, paymentDate: new Date() }, 
       { where: { id: job.id }, transaction}
     );
 
