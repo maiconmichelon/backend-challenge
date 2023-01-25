@@ -1,3 +1,5 @@
+const { HttpError } = require("../utils/error");
+
 const moveMoney = async (app, sourceId, destinationId, amount, transaction) => {
   const { Profile } = app.get('models');
   
@@ -6,6 +8,14 @@ const moveMoney = async (app, sourceId, destinationId, amount, transaction) => {
 
   if (amount > source.balance) {
     throw new HttpError(400, 'Client does not have enough balance');
+  }
+
+  if (!source) {
+    throw new HttpError(400, 'Source of money was not found');
+  }
+
+  if (!destination) {
+    throw new HttpError(400, 'Destination of money was not found');
   }
 
   await Profile.update(

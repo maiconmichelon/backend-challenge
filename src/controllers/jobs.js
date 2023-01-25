@@ -1,7 +1,6 @@
 const {getProfile} = require('../middleware/getProfile');
 const express = require('express');
 const jobsService = require('../services/jobs.service');
-const { HttpError } = require('../utils/error');
 const router = express.Router();
 
 router.get('/unpaid', getProfile, async (req, res) =>{
@@ -9,17 +8,13 @@ router.get('/unpaid', getProfile, async (req, res) =>{
     res.json(jobs)
 });
 
-router.post('/:jobId/pay', getProfile, async(req, res) => {
+router.post('/:jobId/pay', getProfile, async(req, res, next) => {
     try {
         const { jobId } = req.params
         await jobsService.payJob(req.app, req.profile, jobId);
         res.json();
     } catch (err) {
-        if (err instanceof HttpError) { // FIXME try to find a handler
-            res.status(err.code).json(err);
-        } else {
-            res.status(500).json(); // FIXME
-        }
+        next(err);
     }
 });
 
