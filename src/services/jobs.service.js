@@ -1,5 +1,6 @@
 const { Op, Sequelize } = require("sequelize");
 const { HttpError } = require("../utils/error");
+const { moveMoney } = require("./movesMoney.service");
 
 const getUnpaidJobsByProfileId = async(app, profileId) => {
   const {Job, Contract} = app.get('models');
@@ -31,14 +32,24 @@ const getUnpaidJobByClientId = async(app, profileId, jobId, options) => {
       "$Contract.status$": { [Op.in]: ['new', 'in_progress'] },
     },
     include: [
-      {
-        model: Contract,
-        include: [{
-          association: 'Contractor'
-        }, {
-          association: 'Client'
-        }]
-      }
+      Contract
+    ],
+    ...options
+  });
+}
+
+const getSumAmountUnpaidJobsByClientId = async(app, profileId, options) => {
+  const {Job, Contract} = app.get('models');
+  return await Job.sum('price', {
+    where: {
+      // paid: false, // FIXME
+      [Op.or]: {
+        "$Contract.ClientId$": profileId,
+      },
+      "$Contract.status$": { [Op.in]: ['new', 'in_progress'] },
+    },
+    include: [
+      Contract,
     ],
     ...options
   });
@@ -47,7 +58,7 @@ const getUnpaidJobByClientId = async(app, profileId, jobId, options) => {
 const payJob = async (app, profile, jobId) => {
   const sequelize = app.get("sequelize");
   const transaction = await sequelize.transaction();
-  const {Job, Profile} = app.get('models');
+  const {Job } = app.get('models');
 
   try {
     const job = await getUnpaidJobByClientId(app, profile.id, jobId, { transaction });
@@ -55,22 +66,8 @@ const payJob = async (app, profile, jobId) => {
       throw new HttpError(404, 'Job not found');
     }
 
-    const client = job.Contract.Client;
-    const contractor = job.Contract.Contractor;
-    
-    if (job.price > client.balance) {
-      throw new HttpError(401, 'Client does not have enough balance');
-    }
-
-    await Profile.update(
-      { balance: client.balance - job.price }, 
-      { where: { id: client.id }, transaction }
-    );
-
-    await Profile.update(
-      { balance: contractor.balance + job.price }, 
-      { where: { id: contractor.id }, transaction }
-    );
+    const contract = job.Contract;
+    await moveMoney(app, contract.ClientId, contract.ContractorId, job.price, transaction);
 
     await Job.update(
       { paid: true }, 
@@ -79,6 +76,7 @@ const payJob = async (app, profile, jobId) => {
 
     await transaction.commit();
   } catch (err) {
+    console.error(err);
     await transaction.rollback();
     throw err;
   }
@@ -88,4 +86,5 @@ const payJob = async (app, profile, jobId) => {
 module.exports = {
   getUnpaidJobsByProfileId,
   payJob,
+  getSumAmountUnpaidJobsByClientId
 };
