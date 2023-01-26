@@ -1,8 +1,5 @@
 const { Profile, Contract, Job } = require('../src/models');
 
-/* WARNING THIS WILL DROP THE CURRENT DATABASE */
-seed();
-
 async function seed() {
   // create tables
   await Profile.sync({ force: true });
@@ -39,7 +36,7 @@ async function seed() {
       firstName: 'Ash',
       lastName: 'Kethcum',
       profession: 'Pokemon master',
-      balance: 1000000.3,
+      balance: 1.3,
       type:'client'
     }),
     Profile.create({
@@ -77,7 +74,7 @@ async function seed() {
     Contract.create({
       id:1,
       terms: 'bla bla bla',
-     status: 'terminated',
+      status: 'terminated',
       ClientId: 1,
       ContractorId:5
     }),
@@ -227,4 +224,8 @@ async function seed() {
     }),
     
   ]);
+}
+
+module.exports = {
+  seed
 }

@@ -11,8 +11,8 @@ router.get('/unpaid', getProfile, async (req, res) =>{
 router.post('/:jobId/pay', getProfile, async(req, res, next) => {
     try {
         const { jobId } = req.params
-        await jobsService.payJob(req.app, req.profile, jobId);
-        res.json();
+        const result = await jobsService.payJob(req.app, req.profile, jobId);
+        res.json(result);
     } catch (err) {
         next(err);
     }

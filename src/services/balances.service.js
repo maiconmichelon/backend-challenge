@@ -5,10 +5,10 @@ const { moveMoney } = require('./movesMoney.service');
 const deposit = async (app, user, receiverId, amount) => {
   const sequelize = app.get("sequelize");
   const transaction = await sequelize.transaction();
+  const { Profile } = app.get('models');
 
   try {
-    const amountUnpaidJobs = await jobsService.getSumAmountUnpaidJobsByClientId(app, user.id, { transaction })
-    console.log('amount', amount);
+    const amountUnpaidJobs = await jobsService.getSumAmountUnpaidJobsByClientId(app, user.id, { transaction });
 
     const limit = amountUnpaidJobs * 0.25;
     if (amount > limit) {
@@ -18,8 +18,13 @@ const deposit = async (app, user, receiverId, amount) => {
     await moveMoney(app, user.id, receiverId, amount, transaction)
 
     await transaction.commit();
+
+    const updatedProfile = await Profile.findOne({ where: { id: user.id }});
+    return {
+      previousBalance: user.balance,
+      newBalance: updatedProfile.balance,
+    }
   } catch (err) {
-    console.error(err);
     await transaction.rollback();
     throw err;
   }

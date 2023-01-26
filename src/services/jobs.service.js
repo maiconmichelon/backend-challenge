@@ -58,12 +58,12 @@ const getSumAmountUnpaidJobsByClientId = async(app, profileId, options) => {
 const payJob = async (app, profile, jobId) => {
   const sequelize = app.get("sequelize");
   const transaction = await sequelize.transaction();
-  const {Job } = app.get('models');
+  const { Job, Profile } = app.get('models');
 
   try {
     const job = await getUnpaidJobByClientId(app, profile.id, jobId, { transaction });
     if (!job) {
-      throw new HttpError(404, 'Job not found');
+      throw new HttpError(404, 'Job not found or is already paid');
     }
 
     const contract = job.Contract;
@@ -75,6 +75,14 @@ const payJob = async (app, profile, jobId) => {
     );
 
     await transaction.commit();
+
+    const jobPaid = await Job.findOne({ where: { id: job.id }});
+    const updatedProfile = await Profile.findOne({ where: { id: profile.id }});
+    return {
+      job: jobPaid,
+      previousBalance: profile.balance,
+      newBalance: updatedProfile.balance
+    };
   } catch (err) {
     console.error(err);
     await transaction.rollback();

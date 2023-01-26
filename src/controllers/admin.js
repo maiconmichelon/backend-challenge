@@ -1,7 +1,6 @@
 const {getProfile} = require('../middleware/getProfile');
 const express = require('express');
 const adminService = require('../services/admin.service');
-const { HttpError } = require('../utils/error');
 const router = express.Router();
 
 router.get('/best-profession', getProfile, async (req, res, next) => {

@@ -17,7 +17,6 @@ const getBestClients = async (app, startDate, endDate, limit = 2) => {
       }]
     }],
     attributes: [
-      // "Contract->Contractor.profession",
       [Sequelize.fn('sum', Sequelize.col('price')), 'totalAmount'],
     ],
     group: "Contract->Client.id",
