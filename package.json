@@ -11,7 +11,8 @@
   "scripts": {
     "start": "nodemon ./src/server.js",
     "seed": "node -e \"require('./scripts/seedDb.js').seed()\"",
-    "test:integration": "jest -i tests/integration"
+    "test:integration": "jest -i tests/integration",
+    "test:unit": "jest tests/unit"
   },
   "devDependencies": {
     "concurrently": "4.1.0",

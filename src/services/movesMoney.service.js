@@ -6,12 +6,12 @@ const moveMoney = async (app, sourceId, destinationId, amount, transaction) => {
   const source = await Profile.findOne({ where: {id: sourceId }, transaction });
   const destination = await Profile.findOne({ where: {id: destinationId }, transaction });
 
-  if (amount > source.balance) {
-    throw new HttpError(400, 'Client does not have enough balance');
-  }
-
   if (!source) {
     throw new HttpError(400, 'Source of money was not found');
+  }
+
+  if (amount > source.balance) {
+    throw new HttpError(400, 'Client does not have enough balance');
   }
 
   if (!destination) {
